@@ -1,5 +1,5 @@
 <template>
-  <!-- Vue3组件中的模板结构根标签div -->
+  <!-- Vue3组件中的模板结构可以没有根标签div -->
   <img alt="Vue logo" src="./assets/logo.png">
   <HelloWorld msg="Welcome to Your Vue.js App"/>
 </template>
