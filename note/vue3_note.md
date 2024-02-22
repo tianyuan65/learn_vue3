@@ -43,8 +43,20 @@
             cd vue3_test
             npm run serve
           ```
-
 * 1.2 使用vite创建
+    * 官方文档：https://v3.cn.vuejs.org/guide/installation.html#vite
+    * vite官网：https://vitejs.cn
+    * 什么是vite？----新一代前端构建工具
+    * 优势如下：
+        * 1. 开发环境中，无需打包操作，可快速的冷启动
+        * 2. 轻量快速地热重载(HMR)
+        * 3. 真正的按需编译，不再等待整个应用遍已完成
+    * 传统构建与vite构建对比图
+        * 图找不到，在尚硅谷138课看吧
+        * 1. 创建工程，npm init vite-app <project-name>
+        * 2. 进入工程目录，cd <project-name>
+        * 3. 安装依赖，npm install
+        * 4. 运行，npm run dev
 ## 第二章、常用Composition API
 ## 第三章、其他Composition API
 ## 第四章、Composition API的优势
