@@ -33,7 +33,7 @@
             * 移除keyCode支持作为v-on的修饰符
             ...
 
-## 第一章、创建Vue3.
+## 第一章、创建Vue3.0
 * 1.1 使用vue-cli创建
     * 官方文档：https://cli.vuejs.org/zh/guide/creating-a-project.html#vue-create
     * 1. 需要查看vue-cli的版本，要确保vue-cli的版本在4.5.0以上，我的是5.0.8，若vue-cli版本在4.5.0以下，则安装升级vue-cli版本，```npm i -g @vue-cli```，会将最新版本的vue-cli版本安装好，并覆盖掉旧版本；
@@ -58,6 +58,22 @@
         * 3. 安装依赖，npm install
         * 4. 运行，npm run dev
 ## 第二章、常用Composition API
+* 官方文档：https://v3.cn.vuejs.org/guide/composition-api-introduction.html
+* 2.1 拉开序幕的setup
+    * 1. 理解：Vue3.0中一个新的配置项，值为一个函数
+    * 2. setup是所有Composition API(组合API)**表演的舞台**
+    * 3. 组件中所用到的：数据、方法等，均要配置在setup中
+    * 4. setup函数的两种返回值：
+        * (1). **若返回一个对象，则对象中的属性、方法，在模板中均可以直接使用(重点关注)**
+        * (2). 若返回一个渲染函数：则可以自定义渲染内容
+    * 5. 注意点：
+        * (1). 尽量不要与Vue2.x的配置混用
+            * Vue2.x配置(data、methods、computed...)中可以访问到setup中的属性、方法。
+            * 但在setup中不能访问到Vue2.x配置(data、methods、computed...)
+            * 如果有重名setup优先
+        * (2). setup不能是一个async函数，因为返回值不再是return的对象，而是promise，模板看不到return对象中的属性
+
+
 ## 第三章、其他Composition API
 ## 第四章、Composition API的优势
 ## 第五章、新的组件
