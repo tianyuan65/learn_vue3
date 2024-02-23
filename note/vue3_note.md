@@ -73,7 +73,7 @@
             * 如果有重名setup优先
         * (2). setup不能是一个async函数，因为返回值不再是return的对象，而是promise，模板看不到return对象中的属性
 * 2.2 ref函数
-    * 1. 作用：定义一个响应式的数据
+    * 1. 作用：定义一个响应式的数据，用于数据是基本类型
     * 2. 语法：const xxx=ref(initValue)
         * 创建一个包含响应式数据的**引用对象**(全称：引用实现的实例对象，reference对象，简称ref对象)
         * JS中操作数据：xxx.value
@@ -83,7 +83,57 @@
         * 基本类型的数据：响应式依然是靠 Object.defineProperty()的 get与 set完成的。
         * 对象类型的数据：内部**求助**了Vue3.0中的一个新函数—— reactive函数。
     * ![JS中操作数据，需要xxx.value，否则无法更新数据](images/数据已被修改，但未在页面上呈现最新数据.png)
-    * ![.value后，会成功更新数据](images/成功修改数据.png)
+    * ![加了.value后，成功更新数据](images/成功修改数据.png)
+* 2.3 reactive函数
+    * 1. 作用：定义一个**对象类型**的响应式数据(基本类型别用它，用ref函数)
+    * 2. 语法：const 代理对象-proxy=reactive(源对象-Object)，接收一个对象或数组，返回一个代理器对象(Proxy实例对象)，将普通对象转为Proxy实例对象的目的就是为了把数据变成响应式数据，且转为Proxy对象后，修改里面任何一个属性，vue3都可以监测到，并更新页面。
+    * 3. reactive函数定义的响应式数据是**深层次的**
+    * 4. 内部基于ES6的Proxy实现，通过代理对象(Proxy实例对象)操作源对象(Object)内部数据进行操作，且这些操作是可以被Vue所捕获到的，也就是数据劫持
+        * ![定义基本类型数据不要用reactive函数，但是reactive函数定义的对象里可以有基本数据类型](images/定义基本类型数据不要用reactive函数.png)
+        * ![调用reactive函数定义对象类型的响应式数据，图示可以看出初始的响应式数据的](images/调用reactive函数定义对象类型的响应式数据.png)
+        * ```
+            // 数据
+            let job=reactive({
+                type:'frontend engineer',
+                salary:'10k',
+            })
+            // 方法
+            function changeInfo(){
+                job.type='backend enginner'
+                job.salary='13k'
+            }
+            // 返回对象
+            return {
+                job,
+                changeInfo
+            }
+          ```
+            * ![上述代码，调用reactive函数，成功修改对象类型的数据，还不写.value](images/成功修改对象类型的数据，不用写value.png)
+        * ```
+            let hobby=['Osborn','Sariel','Evan']
+            function changeInfo(){
+                hobby[0]='study'
+            }
+            return {hobby,changeInfo}
+          ```
+            * ![调用reactive，传递数组，成功将Osborn改为study](images/调用reactive函数传递数组，直接在事件函数中修改Osborn为study.png)
+* 2.4 Vue3.0中的响应式原理
+    * 2.4.1 Vue2.x的响应式
+        * 1. 实现原理：
+            * 对象类型：通过Object.defineProperty()对属性的读取、修改进行拦截(数据劫持)
+            * 数组类型：通过重写更新数组的一系列方法来实现拦截(对数组的变更方法进行了包裹)
+                * ```
+                    Object.defineProperty(data,'count',{
+                        get(){},
+                        set(){}
+                    })
+                  ```
+        * 2. 存在问题：
+            * 新增属性、删除属性，界面不会更新
+            * 直接通过下标修改数组，界面不会自动更新
+    * 2.4.2 Vue3.0的响应式
+        * 1. 实现原理：
+            * 
 
 
 
@@ -96,3 +146,5 @@
 # # 总结
 * 就是把Osborn创建为一个对象了，然后把值给了value，给value绑定了响应式
 * 数据劫持才是响应式的根基
+* Proxy 相比于 defineProperty 的优点就在于直接监听整个对象，以及能够监听通过数组方法新增的元素
+* 修改基本类型数据用ref函数，修改对象类型(对象和数组)数据用reactive函数
