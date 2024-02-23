@@ -50,7 +50,7 @@
     * 优势如下：
         * 1. 开发环境中，无需打包操作，可快速的冷启动
         * 2. 轻量快速地热重载(HMR)
-        * 3. 真正的按需编译，不再等待整个应用遍已完成
+        * 3. 真正的按需编译，不再等待整个应用编译完成
     * 传统构建与vite构建对比图
         * 图找不到，在尚硅谷138课看吧
         * 1. 创建工程，npm init vite-app <project-name>
@@ -72,9 +72,27 @@
             * 但在setup中不能访问到Vue2.x配置(data、methods、computed...)
             * 如果有重名setup优先
         * (2). setup不能是一个async函数，因为返回值不再是return的对象，而是promise，模板看不到return对象中的属性
+* 2.2 ref函数
+    * 1. 作用：定义一个响应式的数据
+    * 2. 语法：const xxx=ref(initValue)
+        * 创建一个包含响应式数据的**引用对象**(全称：引用实现的实例对象，reference对象，简称ref对象)
+        * JS中操作数据：xxx.value
+        * 模板中读取数据: 不需要.value，直接：``<div>{{xxx}}</div>``
+    * 备注：
+        * 接收的数据可以是：基本类型、也可以是对象类型。
+        * 基本类型的数据：响应式依然是靠 Object.defineProperty()的 get与 set完成的。
+        * 对象类型的数据：内部**求助**了Vue3.0中的一个新函数—— reactive函数。
+    * ![JS中操作数据，需要xxx.value，否则无法更新数据](images/数据已被修改，但未在页面上呈现最新数据.png)
+    * ![.value后，会成功更新数据](images/成功修改数据.png)
+
 
 
 ## 第三章、其他Composition API
 ## 第四章、Composition API的优势
 ## 第五章、新的组件
 ## 第六章、其他
+
+
+# # 总结
+* 就是把Osborn创建为一个对象了，然后把值给了value，给value绑定了响应式
+* 数据劫持才是响应式的根基
