@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue3的响应式原理</title>
+</head>
+<body>
+    <script type="text/javascript">
+        // 源数据
+        let person={
+            name:'Evan',
+            age:26
+        }
+
+        // 模拟Vue2中实现响应式
+        // #region
+        // let p={}
+        // Object.defineProperty(p,'name',{
+        //     // configurable配置意味着可以增删改name属性，没有该配置无法实现删或改的操作
+        //     configurable:true,
+        //     get(){  //有人读取name时调用该函数
+        //         return person.name
+        //     },
+        //     set(value){  //有人修改name时调用该函数
+        //         return person.name=value
+        //     }
+        // })
+        // Object.defineProperty(p,'age',{
+        //     get(){  //有人读取age时调用该函数
+        //         return person.age
+        //     },
+        //     set(value){  //有人修改age时调用该函数
+        //         return person.age=value
+        //     }
+        // })
+        // #endregion
+
+        // 模拟Vue3中实现响应式
+        // window身上的内置构造函数-Proxy，不用下载，不用引入，不用安装
+        // Proxy能够让p映射源数据person的操作，
+        // 将源数据person作为第一个参数传递到Proxy构造函数中，第二个参数可以传递一个空对象占位，但不能不写该配置
+        // #region
+        const p=new Proxy(person,{
+            // 配置对象里配置get和set函数，这两个函数不是Object.defineProperty身上的get和set函数，这里的get和set是Proxy实例对象的get和set
+            // get函数接收两个参数，第一个是源对象-target，这里就是person；第二个是属性名-propName，这里是name
+            get(target,propName){  //有人读取p的某个属性时调用
+                console.log(`someone read ${propName} property in p`);
+                // 返回读取的数据
+                return Reflect.get(target.propName)
+            },
+            // set会比get多接收一个value参数，用于返回修改的数据，
+            set(target,propName,value){  //有人修改p的某个属性或向p添加某个属性时调用
+                // 只要修改数据就会输出下面这行代码
+                console.log(`some modified ${propName} property, It is time to update page`);
+                // 更新数据
+                Reflect.set(target.propName,value)
+            },
+            // 新增deleteProperty函数，当删除某个属性，该函数就会被调用，和get一样接收target和propName为参数，意为从哪里删除，删除哪个属性
+            deleteProperty(target,propName){  //有人删除p的某个属性时调用
+                console.log(`some deleted ${propName} property, It is time to update page`);
+                // 用delete关键字，删除需要删除的属性，并返回，这一步必须写，否则无法真正删除
+                return Reflect.deleteProperty(target,propName)
+            }
+        })
+        // #endregion
+        // console.log(p);  //Proxy(Object) {name: 'Evan', age: 26}
+
+        let obj={a:1,b:2}
+        // 通过Object.defineProperty操作
+        //#region 
+        // try {
+        //     Object.defineProperty(obj,'c',{
+        //         get(){
+        //             return 3
+        //         }
+        //     })
+        //     Object.defineProperty(obj,'c',{
+        //         get(){
+        //             return 4
+        //         }
+        //     })
+        // } catch (error) {
+        //     console.log(error);
+        // }
+        //#endregion
+        // 通过Reflect.defineProperty操作
+        //#region 
+        // const x1=Reflect.defineProperty(obj,'c',{
+        //     get(){
+        //         return 3
+        //     }
+        // })
+        // const x2=Reflect.defineProperty(obj,'c',{
+        //     get(){
+        //         return 4
+        //     }
+        // })
+        // if (x2) {
+        //     console.log('succeed');
+        // } else {
+        //     console.log('failed');
+        // }
+        //#endregion
+    </script>
+</body>
+</html>

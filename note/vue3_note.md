@@ -117,7 +117,7 @@
             return {hobby,changeInfo}
           ```
             * ![调用reactive，传递数组，成功将Osborn改为study](images/调用reactive函数传递数组，直接在事件函数中修改Osborn为study.png)
-* 2.4 Vue3.0中的响应式原理
+* 2.4 Vue2.0中的响应式原理
     * 2.4.1 Vue2.x的响应式
         * 1. 实现原理：
             * 对象类型：通过Object.defineProperty()对属性的读取、修改进行拦截(数据劫持)
@@ -131,10 +131,45 @@
         * 2. 存在问题：
             * 新增属性、删除属性，界面不会更新
             * 直接通过下标修改数组，界面不会自动更新
+            * ![Vue2.x中通过Object.defineProperty()实现数据的响应式](images/Vue2中实现数据的响应式.png)
     * 2.4.2 Vue3.0的响应式
-        * 1. 实现原理：
-            * 
-
+        * 实现原理：
+            * 1. 通过Proxy(代理)对象：拦截对象中任意属性的变化，包括：属性值的读写、属性的添加、属性的删除等。
+                * ![输出Proxy对象，有可对数据进行增删改查操作的配置-Handler，也有数据-Target](images/Proxy能够让p映射源数据person的操作，Handler中有对数据进行增删改查的配置，Target中有数据.png)
+                * ![通过Proxy对象拦截对象中属性的变化](images/Proxy可以捕获到对属性的增删改查的操作.png)
+                * ![Proxy配置对象中配置get函数，用于读取数据，接收的target和propName参数](images/get函数中接收的两个参数target和propName.png)
+                * ![Proxy配置对象中配置set函数，用于更新属性值和添加新属性，接收的target、propName以及value参数](images/输出set函数中接收的参数，源数据、修改的属性、修改的属性的值.png)
+            * 2. 通过Reflect(反射)对象：对源对象的属性进行增删改查的操作
+            * 3. MDN文档中描述的Proxy与Reflect：
+                * Proxy：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy
+                * Reflect：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect
+                * ```
+                    new Proxy(data,{
+                        // 拦截读取属性值
+                        get(target,propName){
+                            return Reflect.get(target.propName)
+                        }
+                        // 拦截修改属性值或添加新属性
+                        set(target,propName,value){
+                            return Reflect.set(target,propName,value)
+                        }
+                        // 拦截删除属性
+                        deleteProperty (target, propName) {
+                            return Reflect.deleteProperty(target, propName)
+                        }
+                    })
+                  ```
+* 2.5 reactive对比ref
+    * 2.5.1 从定义数据角度对比：
+        * 1. ref用来定义：**基本类型数据**
+        * 2. reactive用来定义：**对象或数组类型数据**
+        * 3. 备注：ref也可以用来定义对象/数组类型数据，他内部会自动通过reactive转为代理对象(Proxy实例对象)
+    * 2.5.2 从原理角度对比：
+        * 1. ref通过Object.defineProperty()的get与set来实现响应式(数据劫持)
+        * 2. reactive通过使用Proxy来实现响应式(数据劫持)，并通过Reflect操作**源对象**内部的数据
+    * 2.5.3 从使用角度对比：
+        * 1. ref定义的数据：操作数据需要.value，读取数据时模板中直接读取不需要.value
+        * 2. reactive定义的数据：操作数据与读取数据，均不需要.value
 
 
 ## 第三章、其他Composition API
@@ -148,3 +183,7 @@
 * 数据劫持才是响应式的根基
 * Proxy 相比于 defineProperty 的优点就在于直接监听整个对象，以及能够监听通过数组方法新增的元素
 * 修改基本类型数据用ref函数，修改对象类型(对象和数组)数据用reactive函数
+* Proxy 可以理解成，在目标对象之前架设一层“拦截”，外界对该对象的访问，都必须先通过这层拦截，因此提供了一种机制，可以对外界的访问进行过滤和改写。
+* 调用两次Object.defineProperty()对同一个属性进行增删改查肯定不可能实现后面覆盖前面的，因为 get 和 set 都是回调函数，只有你读取或者修改才能被执行
+* 还有一直情况就是Object和Reflect同时存在，优先显示Object的，无论顺序
+* 对于框架封装来说，Reflect比Object相对来说更友好
