@@ -209,6 +209,49 @@
                     }
                   ```
                 * ![在emits配置项中声明绑定的事件，方法中调用emit方法来绑定事件并传递数据作为参数](images/emits配置项中声明绑定的事件，方法中调用emit方法绑定事件并传递数据作为参数.png)
+* 2.7 计算属性与监视
+    * 2.7.1 computed函数
+        * 与Vue2.x中computed配置功能一致，也分简写和完整写法，当计算出来的属性也可能被读取和修改的话，就用完整写法，否则只是删掉初始化数据都会报错
+        * 写法：
+            * ```
+                import {computed} from 'vue'
+                setup(){
+                    let personData=reactive({
+                        firstName:'陆',
+                        lastName:'沉'
+                    })
+                    // 计算属性--简写，未考虑计算属性被修改的情况
+                    // 将计算出的全名fullName定义为personData的一个属性，因为personData数据是调用reactive函数得来的Proxy实例对象，可以随意地往里增删改查属性，因此fullName也会是响应式
+                    personData.fullName=computed(()=>{
+                      return personData.firstName + '-' + personData.lastName
+                    })
+
+                    // 计算属性--完整版，考虑到被读取和被修改
+                    personData.fullName=computed({
+                        // 被读取
+                        get(){
+                            return personData.firstName + '-' + personData.lastName
+                        },
+                        // 被修改
+                        set(value){
+                            console.log(value);  //陆-沉
+                            // 拆分全名，调用split方法将名字分成数组
+                            const nameArr=value.split('-')
+                            personData.firstName=nameArr[0]
+                            personData.lastName=nameArr[1]
+                            return personData.firstName + '-' + personData.lastName
+                        }
+                    })
+
+                    // 返回对象(常用)，在这里必须返回
+                    return {
+                        personData,
+                    }
+                }
+              ```
+            * ![用computed配置计算出的fullName](images/computed计算来的全名.png)
+            * ![当计算出的属性会被读取或修改时，需要写完整写法，否则如图](images/只是删除了初始化的数据就会报错，所以这种情况需要写完整版.png)
+    * 2.7.2 watch函数
 
 
 ## 第三章、其他Composition API
