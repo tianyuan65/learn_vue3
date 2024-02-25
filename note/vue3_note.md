@@ -170,6 +170,45 @@
     * 2.5.3 从使用角度对比：
         * 1. ref定义的数据：操作数据需要.value，读取数据时模板中直接读取不需要.value
         * 2. reactive定义的数据：操作数据与读取数据，均不需要.value
+* 2.6 setup的两个注意点
+    * 1. setup执行的时机
+        * 在beforeCreate钩子之前执行一次，this指向undefined
+    * 2. setup的参数
+        * props：值为对象，包含：组件外部传递过来，且组件内部声明接收了的属性，传了几个属性，就要在子组件声明接收几个，否则报警告。
+            * ![用props配置项声明接收和没声明接收时Proxy实例对象](images/用props配置声明接收数据是和没声明接收时.png)
+        * context：上下文对象
+            * attrs：值为对象，包含组件外部传递过来，但没有在props配置中声明的属性，相当于this.$attrs，它来兜底，子组件的props配置中没有接收的，在这里偷偷地存着。
+            * slots：收到的插槽内容，相当于this.$slots。值得注意的是，vue3中具名插槽的命名方式有所改动，需要用v-slot:slotName的方式命名。
+                * ```
+                    <template v-slot:cv>
+                        <span>谷江山</span>
+                    </template>
+                  ```
+                * ![配置默认插槽和具名插槽](images/配置默认插槽和具名插槽.png)
+            * emit：分发自定义事件的函数，相当于this.$emit。
+                * ```
+                    App
+                    <TestComp @hello="showHelloMsg" msg="hello" name="yosh"/>
+                    ...
+                    setup(){
+                        function showHelloMsg(value){
+                            alert(`Hello, you have triggered hello event, I got the parameter ${value}!!`)
+                        }
+                        return {showHelloMsg}
+                    }
+
+                    TestComp
+                    <button @click="test">try to trigger hello event in TestComp component</button>
+                    ...
+                    emits:['hello'],
+                    setup(){
+                        function test(){
+                            context.emit('hello',111)
+                        }
+                        return {test}
+                    }
+                  ```
+                * ![在emits配置项中声明绑定的事件，方法中调用emit方法来绑定事件并传递数据作为参数](images/emits配置项中声明绑定的事件，方法中调用emit方法绑定事件并传递数据作为参数.png)
 
 
 ## 第三章、其他Composition API
@@ -187,3 +226,4 @@
 * 调用两次Object.defineProperty()对同一个属性进行增删改查肯定不可能实现后面覆盖前面的，因为 get 和 set 都是回调函数，只有你读取或者修改才能被执行
 * 还有一直情况就是Object和Reflect同时存在，优先显示Object的，无论顺序
 * 对于框架封装来说，Reflect比Object相对来说更友好
+* Vue3会把用props接收到的数据，整理成一个Proxy实例对象，这样子组件接收到的数据，都是响应式的数据
