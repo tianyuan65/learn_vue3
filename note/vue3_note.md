@@ -252,7 +252,7 @@
             * ![用computed配置计算出的fullName](images/computed计算来的全名.png)
             * ![当计算出的属性会被读取或修改时，需要写完整写法，否则如图](images/只是删除了初始化的数据就会报错，所以这种情况需要写完整版.png)
     * 2.7.2 watch函数
-        * 1. 与Vue2.xwatch配置功能一直
+        * 1. 与Vue2.x中watch配置功能一致
         * 2. 两个小“坑”：
             * 监视reactive定义的响应式数据时，oldValue无法正确获取，强制开启了深度监视(deep配置失效)
             * 监视reactive定义的响应式数据的某个属性为对象时，deep配置生效
@@ -297,6 +297,9 @@
                 }
               ```
             * ![情况五效果图，监测由reactive定义的响应式数据的多个属性时](images/监测reactive定义的一个响应式数据中的某些属性.png)
+        3. 一个极为较真的情况，调用ref函数定义对象类型的响应式数据时，监视这个响应式数据有两种方式。一是调用watch函数传递要监测的属性名为参数时，写成```xxx.value```形式，因为调用ref定义的响应式数据输出后会得到RefImpl实例对象，其中存放数据的value属性的值为Proxy实例对象，说明即使调用ref函数定义了对象类型的响应式数据，内部依然会借助reactive函数来定义并生成Proxy实例对象，会自动开启深度监测，所以如果不加上.value，还要修改这个Proxy实例对象里的某个属性，因为地址值未发生改变，所以Vue不但监测不到，还会报错；二是监测的属性依旧是person，但是为其开启深度监测的配置
+            * ![调用ref定义的RefImpl对象的value属性值若是Proxy实例对象，监测时需要开启深度配置](images/调用ref定义的person对象后输出的RefImpl对象，里面value属性里是Proxy实例对象.png)
+            * ![调用ref定义的RefImpl对象的value属性值若是Proxy实例对象，监测时需要加上.value，这样就自动开启深度监测了](images/若用ref函数定义了对象类型的响应式数据，监测时需要写value才不报错.png)
 
 
 ## 第三章、其他Composition API
@@ -315,3 +318,4 @@
 * 还有一直情况就是Object和Reflect同时存在，优先显示Object的，无论顺序
 * 对于框架封装来说，Reflect比Object相对来说更友好
 * Vue3会把用props接收到的数据，整理成一个Proxy实例对象，这样子组件接收到的数据，都是响应式的数据
+* watch监听的是实现响应式的代理结构，而不是数据源本身，所以监测的不应该是RefImpl.value，而是RefImpl实例对象
