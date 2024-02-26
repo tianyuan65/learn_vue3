@@ -322,7 +322,28 @@
               ```
             * ![调用ref定义的RefImpl对象的value属性值若是Proxy实例对象，监测时需要开启深度配置](images/调用ref定义的person对象后输出的RefImpl对象，里面value属性里是Proxy实例对象.png)
             * ![调用ref定义的RefImpl对象的value属性值若是Proxy实例对象，监测时需要加上.value，这样就自动开启深度监测了](images/若用ref函数定义了对象类型的响应式数据，监测时需要写value才不报错.png)
-        
+        * 4. watchEffect函数
+            * watch的套路是：既要指明监测的属性，也要指明监测的回调
+            * watchEffect的套路是：不用指明监测哪个属性，监测的回调中用到哪个属性，那就监测哪个属性。
+            * watchEffect指定的回到何时执行？
+                * 初始化的时候执行一次；回调里所依赖/用到的数据发生变化时，执行一次
+            * watchEffect有点像computed：
+                * (1). 但computed注重的计算出来的值，也就是回调函数的返回值，所以必须要写返回值。
+                * (2). 而watchEffect更注重过程，也就是回调函数的函数体，所以不用写返回值。
+                * ```
+                    function changeJob(){
+                        person.job.job1.type='bounty hunter'
+                    }
+                    // 监测
+                    watchEffect(()=>{
+                        // 很智能，用了哪个属性就监测哪个属性；
+                        const x1=sum.value
+                        // 很智能，能够分别多层的对象
+                        const jobType=person.job.job1.type
+                        console.log('the callback which watchEffect assigned run',x1,jobType);
+                    })
+                  ```
+                * ![用到哪个属性，就监测哪个，还能分别多层对象](images/很智能，watchEffect指定的回调内用到哪个属性就监测哪个；还能分别多层对象.png)
 
 
 ## 第三章、其他Composition API
@@ -342,3 +363,4 @@
 * 对于框架封装来说，Reflect比Object相对来说更友好
 * Vue3会把用props接收到的数据，整理成一个Proxy实例对象，这样子组件接收到的数据，都是响应式的数据
 * watch监听的是实现响应式的代理结构，而不是数据源本身，所以监测的不应该是RefImpl.value，而是RefImpl实例对象
+* watch是指哪打哪，watchEffect是打哪指哪
