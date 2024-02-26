@@ -297,9 +297,32 @@
                 }
               ```
             * ![情况五效果图，监测由reactive定义的响应式数据的多个属性时](images/监测reactive定义的一个响应式数据中的某些属性.png)
-        3. 一个极为较真的情况，调用ref函数定义对象类型的响应式数据时，监视这个响应式数据有两种方式。一是调用watch函数传递要监测的属性名为参数时，写成```xxx.value```形式，因为调用ref定义的响应式数据输出后会得到RefImpl实例对象，其中存放数据的value属性的值为Proxy实例对象，说明即使调用ref函数定义了对象类型的响应式数据，内部依然会借助reactive函数来定义并生成Proxy实例对象，会自动开启深度监测，所以如果不加上.value，还要修改这个Proxy实例对象里的某个属性，因为地址值未发生改变，所以Vue不但监测不到，还会报错；二是监测的属性依旧是person，但是为其开启深度监测的配置
+        3. 一个极为较真的情况，调用ref函数定义对象类型的响应式数据时，监视这个响应式数据有两种方式。一是调用watch函数传递要监测的属性名为参数时，写成```xxx.value```形式，因为调用ref定义的响应式数据输出后会得到RefImpl实例对象，其中存放数据的value属性的值为Proxy实例对象，说明即使调用ref函数定义了对象类型的响应式数据，内部依然会借助reactive函数来定义并生成Proxy实例对象，会自动开启深度监测，所以如果不加上.value，还要修改这个Proxy实例对象里的某个属性，因为地址值未发生改变，所以Vue不但监测不到，还会报错；二是监测的属性依旧是person，但是为其开启深度监测的配置。
+            * ```
+                let sum=ref(0)
+                let person=ref({
+                    name:'萧逸',
+                    age:23,
+                    job:{
+                    job1:{
+                        type:'racer'
+                    }
+                    }
+                })
+                // 用ref定义基本数据类型的响应式不需要加上.value来监视，因为监测调用ref函数所定义的RefImpl实例对象，而不是数据本身，
+                watch(sum,(newValue)=>{
+                    console.log('sum的值变化了，新值为',newValue);
+                })
+                // 但若调用ref函数定义的是对象类型的响应式，则需要加上.value，因为用ref定义对象类型的数据，输出的是RefImpl实例对象，
+                // 这个对象里包着Proxy实例对象，就需要写成person.value，这个person.value就是Proxy实例对象，会自动开启深度监测；
+                // 所以若不写.value，还要修改这个Proxy实例对象里的某个属性，因为地址值未发生改变，所以Vue不但监测不到，还会报错，
+                watch(person,(newValue)=>{
+                    console.log('person属性的值变化了，新值为',newValue);
+                },{deep:true})  // 但若坚持不写.value的话，配置deep
+              ```
             * ![调用ref定义的RefImpl对象的value属性值若是Proxy实例对象，监测时需要开启深度配置](images/调用ref定义的person对象后输出的RefImpl对象，里面value属性里是Proxy实例对象.png)
             * ![调用ref定义的RefImpl对象的value属性值若是Proxy实例对象，监测时需要加上.value，这样就自动开启深度监测了](images/若用ref函数定义了对象类型的响应式数据，监测时需要写value才不报错.png)
+        
 
 
 ## 第三章、其他Composition API
