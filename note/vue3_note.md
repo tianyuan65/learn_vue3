@@ -344,6 +344,23 @@
                     })
                   ```
                 * ![用到哪个属性，就监测哪个，还能分别多层对象](images/很智能，watchEffect指定的回调内用到哪个属性就监测哪个；还能分别多层对象.png)
+* 2.8 生命周期
+    * ![Vue3生命周期图示](images/Vue3生命周期.png)
+    * Vue3中可以继续使用Vue2.x中的生命周期钩子，但有两个钩子被更名
+        * beforeDestroy更名为beforeUNmount
+        * destroyed更名为unmounted
+        * ![Vue3中配置项形式的生命周期hook的执行顺序](images/TestComp组件的创建、挂载、更新、卸载与重新挂载.png)
+    * Vue3也提供了Composition API形式的生命周期钩子，与Vue2.x中钩子对应关系如下：
+        * beforeCreate===>setup()
+        * created========>setup()
+        * beforeMount====>onBeforeMount
+        * mounted========>onMounted
+        * beforeUpdate===>onBeforeUpdate
+        * updated========>onUpdated
+        * beforeUnmount==>onBeforeUnmount
+        * unmounted======>onUnmounted
+        * ![组合式API形式使用生命周期hook](images/组合式API的形式使用生命周期钩子.png)
+    * 值得注意的是配置项形式的beforeCreate和created，在组合式API中的写法是setup()，因为setup配置在beforeCreate钩子前执行，所以beforeCreate和created配置在组合式API中就被setup配置了。其他的hook配置在setup内是一个一个的函数，在各自的函数内指定各自的回调，且组合式API的生命周期hook会比配置项形式的生命周期hook优先执行。
 
 
 ## 第三章、其他Composition API
