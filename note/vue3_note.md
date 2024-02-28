@@ -417,9 +417,96 @@
                 },
             }
           ```
+* 2.10 toRef
+    * 作用：创建一个ref对象，其value值指向另一个对象中的某个属性
+    * 语法：const name=toRef(person,'name')
+    * 应用：要将响应式对象中的某个属性单独提供给外部使用时。
+        * ```
+            <h4>{{person}}</h4>
+            <h2>姓名：{{name}}</h2>
+            <h2>年龄：{{age}}</h2>
+            <h2>职业：{{type}}</h2>
+            <button @click="name+='~'">modify name</button>
+            <button @click="age++">increase age</button>
+            <button @click="changeJob">change job</button>
 
+            // 从vue引入ref函数，watch组合式API
+            import {reactive,toRef} from 'vue'
+            export default {
+                name: 'TestComp',
+                
+                setup(){
+                    // 数据
+                    let person=reactive({
+                        name:'萧逸',
+                        age:23,
+                        job:{
+                            job1:{
+                                type:'racer'
+                            }
+                        }
+                    })
+                    function changeJob(){
+                        // 在这了不能将hisJob作为变量修改值，报错显示是hisJob是一个常量，还是需要一步一步找到具体属性名
+                        person.job.job1.type='bounty hunter'
+                    }
+                    return {
+                        // 第一个参数：想要操作的对象，就是想要提取的属性名所在的对象；第二个参数：想要提取的属性名
+                        // 这三个是把person对象里的三个属性，拆散了展示的，数据变化时仍与person对象对话
+                        name:toRef(person,'name'),  // 调用toRef函数定义的ref对象，读取的是person.name赋值给name变量的
+                        age:toRef(person,'age'),
+                        type:toRef(person.job.job1,'type'),
+                        changeJob
+                    }
+                }
+          ```
+        * ![调用toRef函数，将对象中的属性生成为ref对象，且变化的数据仍与源数据对话](images/调用toRef函数，实现对象中普通属性的变为ref对象，数据变化时仍与源数据对话.png)
+    * 扩展：toRefs与toRef功能一致，但可以批量创建多个ref对象，语法：toRefs(person)
+        * ```
+            <h4>{{person}}</h4>
+            <h2>姓名：{{name}}</h2>
+            <h2>年龄：{{age}}</h2>
+            <!-- 用toRefs的话按照模板里的写，用toRef的话只写type -->
+            <h2>职业：{{job.job1.type}}</h2>
+            <button @click="name+='~'">modify name</button>
+            <button @click="age++">increase age</button>
+            <button @click="changeJob">change job</button>
+
+            // 从vue引入ref函数，watch组合式API
+            import {reactive,toRefs} from 'vue'
+            export default {
+                name: 'TestComp',
+                
+                setup(){
+                    // 数据
+                    let person=reactive({
+                        name:'萧逸',
+                        age:23,
+                        job:{
+                            job1:{
+                                type:'racer'
+                            }
+                        }
+                    })
+                    function changeJob(){
+                        // 在这了不能将hisJob作为变量修改值，报错显示是hisJob是一个常量，还是需要一步一步找到具体属性名
+                        person.job.job1.type='bounty hunter'
+                    }
+                    return {
+                        // 调用toRefs函数，批量将person对象的属性提取为ref对象，... 是因为在返回的对象里，通过...的方式将调用toRefs函数调用后生成的对象中的每一组键值对，摊在需要返回的对象内
+                        ...toRefs(person),
+                        changeJob
+                    }
+                }
+            }
+          ```
 
 ## 第三章、其他Composition API
+* 3.1 shallowReactive与shallowRef
+* 3.2 readonly与shallowReadonly
+
+
+
 ## 第四章、Composition API的优势
 ## 第五章、新的组件
 ## 第六章、其他
@@ -437,3 +524,5 @@
 * Vue3会把用props接收到的数据，整理成一个Proxy实例对象，这样子组件接收到的数据，都是响应式的数据
 * watch监听的是实现响应式的代理结构，而不是数据源本身，所以监测的不应该是RefImpl.value，而是RefImpl实例对象
 * watch是指哪打哪，watchEffect是打哪指哪
+* name是新值，新定义的变量，独立的内存空间，就算被p.name赋值，也没有proxy的监视
+* 程序员亲自xxx.xxx并赋值给一个变量的不是响应式数据，那只是基本数据或普通对象
