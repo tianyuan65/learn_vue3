@@ -512,9 +512,13 @@
         * 如果有一个对象数据，结构比较深，但变化时，只是外层属性变化==>shallowReactive
         * 如果有一个对象数据，后续功能不会修改该对象中的属性，而是生成新的对象来替换==>shallowRef，按照例子里的话，如果不会修改y中a属性的值的话，就用shallowRef，修改了的后果就是上面图示里点击按钮后，模板中呈现的是NaN
 * 3.2 readonly与shallowReadonly
-    * readonly
-    * shallowReadonly
-    * 
+    * readonly:让一个响应式数据变为只读的(深只读)
+    * shallowReadonly:让一个响应式数据变为只读的(浅只读)
+    * 应用场景：不希望数据被修改时。
+        * ![被readonly加工过的对象类型的响应式数据](images/readonly，被readonly加工的数据，不允许被修改.png)
+        * ![被readonly加工过的基本数据类型的响应式数据](images/readonly，被传递基本数据类型的响应式数据.png)
+        * ![被shallowReadonly加工的嵌套了的对象类型的响应式数据，深层次的数据科被修改](images/shallowReadonly，只不允许修改第一层数据，嵌套了的更深的数据可更新.png)
+        * ![基本数据类型的响应式，无论是被readonly还是shallowReadonly加工，都不允许被修改](images/基本数据类型的响应式，被shallowReadonly还是readonly加工了就不允许修改.png)
 
 
 
@@ -537,4 +541,4 @@
 * watch是指哪打哪，watchEffect是打哪指哪
 * name是新值，新定义的变量，独立的内存空间，就算被p.name赋值，也没有proxy的监视
 * 程序员亲自xxx.xxx并赋值给一个变量的不是响应式数据，那只是基本数据或普通对象
-* 
+* 页面没有变化有两种情况：1. 数据变化了，但数据不是响应式的，就像声明一个变量，将响应式数据里的一个属性赋值给变量一样，变量值变出花来，Vue没有监测到，那页面就不会有变化；2. 数据没有发生变化，也就是数据不允许被修改
