@@ -459,6 +459,7 @@
                         changeJob
                     }
                 }
+            }
           ```
         * ![调用toRef函数，将对象中的属性生成为ref对象，且变化的数据仍与源数据对话](images/调用toRef函数，实现对象中普通属性的变为ref对象，数据变化时仍与源数据对话.png)
     * 扩展：toRefs与toRef功能一致，但可以批量创建多个ref对象，语法：toRefs(person)
@@ -503,7 +504,17 @@
 
 ## 第三章、其他Composition API
 * 3.1 shallowReactive与shallowRef
+    * shallowReactive:只处理对象最外层属性的响应式(浅响应式)。调用ref函数将对象类型的数据变为响应式数据时，底层会帮助调用reactive函数，将其变为Proxy实例对象；但调用shallowReactive函数，传入对象类型的数据的话，不处理对象类型的响应式，在内部也不求助reactive来将对象类型处理为响应式数据
+        * ![只处理最外层属性的响应式](images/shallowReactive与reactive对比，shallowReactive只处理第一层的数据为响应式.png)
+    * shallowRef:只处理基本数据类型的响应式，不进行对象的响应式处理。就算传入对象类型，也只返回传入的普通函数
+        * ![只处理基本数据类型的响应式，即使传递对象类型，最终返回普通对象](images/shallowRef与ref，传递基本数据为响应式时功能无区别，传递对象类型shallowRef返回的依然是普通对象.png)
+    * 何时调用/使用？
+        * 如果有一个对象数据，结构比较深，但变化时，只是外层属性变化==>shallowReactive
+        * 如果有一个对象数据，后续功能不会修改该对象中的属性，而是生成新的对象来替换==>shallowRef，按照例子里的话，如果不会修改y中a属性的值的话，就用shallowRef，修改了的后果就是上面图示里点击按钮后，模板中呈现的是NaN
 * 3.2 readonly与shallowReadonly
+    * readonly
+    * shallowReadonly
+    * 
 
 
 
@@ -526,3 +537,4 @@
 * watch是指哪打哪，watchEffect是打哪指哪
 * name是新值，新定义的变量，独立的内存空间，就算被p.name赋值，也没有proxy的监视
 * 程序员亲自xxx.xxx并赋值给一个变量的不是响应式数据，那只是基本数据或普通对象
+* 
