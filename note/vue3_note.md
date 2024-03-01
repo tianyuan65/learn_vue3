@@ -506,7 +506,7 @@
 * 3.1 shallowReactive与shallowRef
     * shallowReactive:只处理对象最外层属性的响应式(浅响应式)。调用ref函数将对象类型的数据变为响应式数据时，底层会帮助调用reactive函数，将其变为Proxy实例对象；但调用shallowReactive函数，传入对象类型的数据的话，不处理对象类型的响应式，在内部也不求助reactive来将对象类型处理为响应式数据
         * ![只处理最外层属性的响应式](images/shallowReactive与reactive对比，shallowReactive只处理第一层的数据为响应式.png)
-    * shallowRef:只处理基本数据类型的响应式，不进行对象的响应式处理。就算传入对象类型，也只返回传入的普通函数
+    * shallowRef:只处理基本数据类型的响应式，不进行对象的响应式处理。就算传入对象类型，也只返回传入的普通对象
         * ![只处理基本数据类型的响应式，即使传递对象类型，最终返回普通对象](images/shallowRef与ref，传递基本数据为响应式时功能无区别，传递对象类型shallowRef返回的依然是普通对象.png)
     * 何时调用/使用？
         * 如果有一个对象数据，结构比较深，但变化时，只是外层属性变化==>shallowReactive
@@ -519,6 +519,17 @@
         * ![被readonly加工过的基本数据类型的响应式数据](images/readonly，被传递基本数据类型的响应式数据.png)
         * ![被shallowReadonly加工的嵌套了的对象类型的响应式数据，深层次的数据科被修改](images/shallowReadonly，只不允许修改第一层数据，嵌套了的更深的数据可更新.png)
         * ![基本数据类型的响应式，无论是被readonly还是shallowReadonly加工，都不允许被修改](images/基本数据类型的响应式，被shallowReadonly还是readonly加工了就不允许修改.png)
+* 3.3 toRaw与markRow
+    * toRaw
+        * 作用：将一个由reactive生成的响应式对象转为普通对象，ref生成的响应式不行。
+        * 使用场景：用于读取响应式对象对应的普通对象，对这个普通对象的所有操作，不会引起页面更新，只是呈现在页面中。
+            * ![调用toRaw，将调用reactive函数生成的响应式数据转为普通对象](images/调用toRaw，将响应式数据变为普通数据.png)
+    * MarkRow
+        * 作用：标记一个对象，使其永远不会再成为响应式对象
+        * 应用场景：
+            * 1. 有些值不应被设置为响应式的，例如复杂的第三方类库等，如axios，日期
+            * 2. 当渲染具有不可变数据源的大列表时，跳过响应式转换可以提高性能，如全国城市列表、品牌方商品列表
+            * ![标记一个对象，使其永远不会成为响应式对象](images/调markRaw，将响应式数据调为普通对象，只用于呈现.png)
 
 
 
