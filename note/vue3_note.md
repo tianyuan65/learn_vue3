@@ -524,12 +524,62 @@
         * 作用：将一个由reactive生成的响应式对象转为普通对象，ref生成的响应式不行。
         * 使用场景：用于读取响应式对象对应的普通对象，对这个普通对象的所有操作，不会引起页面更新，只是呈现在页面中。
             * ![调用toRaw，将调用reactive函数生成的响应式数据转为普通对象](images/调用toRaw，将响应式数据变为普通数据.png)
-    * MarkRow
+    * markRow
         * 作用：标记一个对象，使其永远不会再成为响应式对象
         * 应用场景：
             * 1. 有些值不应被设置为响应式的，例如复杂的第三方类库等，如axios，日期
             * 2. 当渲染具有不可变数据源的大列表时，跳过响应式转换可以提高性能，如全国城市列表、品牌方商品列表
             * ![标记一个对象，使其永远不会成为响应式对象](images/调markRaw，将响应式数据调为普通对象，只用于呈现.png)
+* 3.4 customRef
+    * 作用：创建一个自定义的ref，并对其依赖项跟踪和更新触发进行显式控制。
+    * 实现防抖效果：
+        * ```
+            <template>
+                <input type="text" v-model="keyWord">
+                <h3>{{keyWord}}</h3>
+            </template>
+
+            <script>
+            import {customRef} from 'vue'
+            export default {
+                name: 'App',
+                setup(){
+                // 声明一个自定义的ref，名为myRef，这里传递的参数value，我传入的初始值，也就是'hello'
+                function myRef (value,delay) {
+                    let timer
+                    // 调用customRef函数得到的数据必须要返回，否则myRef无意义
+                    return customRef(  // 属于毛坯房，水电气都没通，需要自己装修
+                        // 给这个回调传递两个函数参track和trigger为参数
+                        (track,trigger)=>{  // 自定义的逻辑在这里写
+                            // 要求必须返回对象，这一步是语法要求
+                            return {
+                                // 有人读取myRef中的数据时被调用
+                                get(){
+                                    // 模板中有几个读取的地方就调用几次get
+                                    console.log(`someone read data from myRef container, I gave him ${value}`);
+                                    track()  // 调用track函数，通知Vue追踪数据，value的改变，不写这一步模板无法获取最新数据(提前和get商量，让它认为这个value是有用的)
+                                    return value
+                                },
+                                // 当有人通过页面上的v-model影响/修改内部数据时被调用，这里传递的newValue是数据更新时，需要传递的newValue，这就跟computed里的set一样
+                                set(newValue){
+                                    console.log(`someone updated data ${newValue} in myRef container`);
+                                    clearTimeout(timer)  // 为了防止函数抖动，定时器在不停地开启关闭，不会出现因为频繁地更新数据而抖动的情况
+                                    timer=setTimeout(() => {  // 延迟1000ms更新数据
+                                        value=newValue  // 更新数据
+                                        trigger()  // 调用trigger函数，通知Vue重新解析模板，将最新数据呈现到页面上
+                                    }, delay);  // 调用myRef中作为第二个参数传递了事件，在声明myRef函数时，传递delay为形参
+                                }
+                            }
+                        }
+                    )
+                }
+                // let keyWord=ref('hello')  //使用Vue提供的ref，相当于精装房，可拎包入住
+                let keyWord=myRef('hello',1000)  //使用程序员自定义的ref，延迟1000ms在页面更新数据
+                return {keyWord}
+                }
+            }
+            </script>
+          ```
 
 
 
@@ -553,3 +603,4 @@
 * name是新值，新定义的变量，独立的内存空间，就算被p.name赋值，也没有proxy的监视
 * 程序员亲自xxx.xxx并赋值给一个变量的不是响应式数据，那只是基本数据或普通对象
 * 页面没有变化有两种情况：1. 数据变化了，但数据不是响应式的，就像声明一个变量，将响应式数据里的一个属性赋值给变量一样，变量值变出花来，Vue没有监测到，那页面就不会有变化；2. 数据没有发生变化，也就是数据不允许被修改
+* 防抖：一定时间后再执行回调函数，期间被重新触发时则重新计时
