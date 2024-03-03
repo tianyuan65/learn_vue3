@@ -515,9 +515,9 @@
     * readonly:让一个响应式数据变为只读的(深只读)
     * shallowReadonly:让一个响应式数据变为只读的(浅只读)
     * 应用场景：不希望数据被修改时。
-        * ![被readonly加工过的对象类型的响应式数据](images/readonly，被readonly加工的数据，不允许被修改.png)
-        * ![被readonly加工过的基本数据类型的响应式数据](images/readonly，被传递基本数据类型的响应式数据.png)
-        * ![被shallowReadonly加工的嵌套了的对象类型的响应式数据，深层次的数据科被修改](images/shallowReadonly，只不允许修改第一层数据，嵌套了的更深的数据可更新.png)
+        * ![被readonly加工过的对象类型的响应式数据，不允许修改](images/readonly，被readonly加工的数据，不允许被修改.png)
+        * ![被readonly加工过的基本数据类型的响应式数据，不允许修改](images/readonly，被传递基本数据类型的响应式数据.png)
+        * ![被shallowReadonly加工的嵌套了的对象类型的响应式数据，深层次的数据可被修改](images/shallowReadonly，只不允许修改第一层数据，嵌套了的更深的数据可更新.png)
         * ![基本数据类型的响应式，无论是被readonly还是shallowReadonly加工，都不允许被修改](images/基本数据类型的响应式，被shallowReadonly还是readonly加工了就不允许修改.png)
 * 3.3 toRaw与markRow
     * toRaw
@@ -581,7 +581,28 @@
             </script>
           ```
         * ![调用customRef，并写入自定义的逻辑，实现页面的呈现和数据更新导致的页面更新](images/customRef的第一个参数回调-实现页面的呈现和数据更新带来的页面更新.png)
-
+* 3.5 provide与inject
+    * 作用：实现祖孙组件间通信
+    * 套路：祖先组件有一个provide选项来提供数据，后代组件有一个inject选项来开始使用这些数据
+    * 具体写法：
+        * ```
+            祖
+            setup(){
+                let car=reactive({name:'玛莎拉蒂',price:'80W'})
+                // 调用provide函数，给自己的后代组件传递数据，第一个参数是需要传递的数据，提供的数据名；第二个参数是真正的数据
+                provide('car',car)
+                return {...toRefs(car)}
+            }
+            ...
+            后代
+            setup() {
+                // 调用inject函数，从祖先组件接收数据
+                let car=inject('car')
+                console.log('grandson',car);
+                return {car}
+            }
+          ```
+        * ![调用provide和inject，从祖先组件传递数据到后代组件](images/调用provide和inject，从祖先组件传递数据到后代组件.png)
 
 
 
