@@ -603,6 +603,11 @@
             }
           ```
         * ![调用provide和inject，从祖先组件传递数据到后代组件](images/调用provide和inject，从祖先组件传递数据到后代组件.png)
+* 3.6 响应式数据的判断
+    * isRef:检查一个值是否为一个ref对象
+    * isReactive:检查一个对象是否是由reactive创建额响应式代理
+    * isReadonly:检查一个对象是否是由readonly创建的只读代理
+    * isProxy:检查一个对象是否是由reactive或readonly方法创建的代理
 
 
 
