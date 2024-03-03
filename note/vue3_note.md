@@ -71,7 +71,7 @@
             * Vue2.x配置(data、methods、computed...)中可以访问到setup中的属性、方法。
             * 但在setup中不能访问到Vue2.x配置(data、methods、computed...)
             * 如果有重名setup优先
-        * (2). setup不能是一个async函数，因为返回值不再是return的对象，而是promise，模板看不到return对象中的属性
+        * (2). setup不能是一个async函数，因为返回值不再是return的对象，而是promise，模板看不到return对象中的属性(后期也可以返回一个Promise实例，但需要Suspense和异步组件的配合)
 * 2.2 ref函数
     * 1. 作用：定义一个响应式的数据，用于数据是基本类型
     * 2. 语法：const xxx=ref(initValue)
@@ -647,6 +647,39 @@
           ```
         * ![to属性指向body时](images/teleport，to属性指向body时.png)
         * ![to属性指向html时](images/teleport，to属性指向html时.png)
+* 5.3 Suspense
+    * 等待异步组件时渲染一些额外内容，让应用有更好的用户体验
+    * 使用步骤：
+        * 引入异步组件
+            * ```
+                // 引入定义异步组件的API，defineAsyncComponent
+                import {defineAsyncComponent} from 'vue'
+                // 动态引入组件/异步引入组件--赋值语句，调用defineAsyncComponent函数，传递一个回调，回调需要返回调用import函数得到的返回值，调用import函数得到的返回值就是子组件ChildComp
+                const Child=defineAsyncComponent(()=>import('./components/ChildComp.vue'))
+              ```
+        * 使用Suspense包裹组件，并配置好default和fallback，Suspense本身的底层逻辑是一种插槽，配置v-slot:default的template标签里写本来就应该展示到页面上的组件，在这里是Child；配置v-slot:fallback的template标签包裹预备的内容，可以是提醒用户稍等，正在加载中的字样，相当于懒加载。
+            * ```
+                <template>
+                    <div class="app">
+                        <h3>It is App component</h3>
+                        <!-- Suspense，内置组件，本身底层逻辑是一种插槽，来包裹需要异步展示的组件 -->
+                        <Suspense>
+                            <!-- 包裹真正需要展示的组件，并指明插槽内是什么，v-slot:default中default代表就是本应该展示的组件 -->
+                            <template v-slot:default>
+                                <Child/>
+                            </template>
+                            <!-- 包裹预备的内容，可以认为是懒加载，用v-slot:fallback来实现 -->
+                            <template v-slot:fallback>
+                                <!-- <Child/> -->
+                                <h3>Loading, please waiting patiently......</h3>
+                            </template>
+                        </Suspense>
+                    </div>
+                </template>
+              ```
+            * ![加载中](images/加载中.png)
+            * ![加载成功](images/加载成功.png)
+        * 补充：异步组件，顾名思义，需要等待一段时间后再展示想要展示的内容，但之前说过setup函数不能是异步函数，因为若setup是异步函数，返回的就不是对象，而是Promise实例对象。但此时因为需要使用异步函数来，配合Suspense和异步组件，setup甚至可以是一个异步函数，并且返回的是一个Promise实例对象，Promise实例对象可以等到异步函数返回成功的结果后，再进行返回。
 
 ## 第六章、其他
 
