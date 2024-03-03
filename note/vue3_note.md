@@ -609,9 +609,21 @@
     * isReadonly:检查一个对象是否是由readonly创建的只读代理
     * isProxy:检查一个对象是否是由reactive或readonly方法创建的代理
 
-
-
 ## 第四章、Composition API的优势
+* 4.1 Options API存在的问题--散装
+    * 使用传统Options API中，新增或修改一个需求，就需要分别在data、methods、computed、watch这些配置项里增删改。下面为Options API的data、methods、computed、watch配置散装运行图示
+    * ```
+        <img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f84e4e2c02424d9a99862ade0a2e4114~tplv-k3u1fbpfcp-watermark.image" style="width:600px;float:left" />
+        <img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/e5ac7e20d1784887a826f6360768a368~tplv-k3u1fbpfcp-watermark.image" style="zoom:50%;width:560px;left" /> 
+      ```
+* 4.2 Composition API的优势--集中式管理
+    * 可以更优雅地组织代码、函数，让相关功能的代码更加有序地组织在一起，将这些数据、方法、功能点打包在一起的就是一个一个的自定义hook函数，下面为数据、方法、计算属性、监测属性集中式管理的图示
+    * ```
+         <img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/bc0be8211fc54b6c941c036791ba4efe~tplv-k3u1fbpfcp-watermark.image"style="height:360px"/>
+         <img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6cc55165c0e34069a75fe36f8712eb80~tplv-k3u1fbpfcp-watermark.image"style="height:360px"/>
+      ```
+
+
 ## 第五章、新的组件
 ## 第六章、其他
 
