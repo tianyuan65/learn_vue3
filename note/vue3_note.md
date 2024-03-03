@@ -623,8 +623,31 @@
          <img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6cc55165c0e34069a75fe36f8712eb80~tplv-k3u1fbpfcp-watermark.image"style="height:360px"/>
       ```
 
-
 ## 第五章、新的组件
+* 5.1 Fragment
+    * 在Vue2中：组件必须有一个根标签
+    * 在Vue3中：组件可以没有跟标签，内部会将多个标签在一个Fragment虚拟元素中
+    * 好处：减少标签层级，减少内存占用
+* 5.2 Teleport
+    * 什么是Teleport？--Teleport是一种能够将我们组件html结构移动到指定位置的技术
+        * ```
+            <!-- teleport标签的to属性，定位在哪里，展示值为html就是以整个页面作为 -->
+            <teleport to='html'>
+                <!-- 遮罩层，为其添加v-if，调用出现弹窗的事件回调时出现遮罩层 -->
+                <div v-if="isShow" class="mask">
+                    <div class="dialog">
+                        <h3>It is a pop-up</h3>
+                        <h4>some content</h4>
+                        <h4>some content</h4>
+                        <h4>some content</h4>
+                        <button @click="isShow=false">click to close the window</button>
+                    </div>
+                </div>
+            </teleport>
+          ```
+        * ![to属性指向body时](images/teleport，to属性指向body时.png)
+        * ![to属性指向html时](images/teleport，to属性指向html时.png)
+
 ## 第六章、其他
 
 
