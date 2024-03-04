@@ -682,6 +682,69 @@
         * 补充：异步组件，顾名思义，需要等待一段时间后再展示想要展示的内容，但之前说过setup函数不能是异步函数，因为若setup是异步函数，返回的就不是对象，而是Promise实例对象。但此时因为需要使用异步函数来，配合Suspense和异步组件，setup甚至可以是一个异步函数，并且返回的是一个Promise实例对象，Promise实例对象可以等到异步函数返回成功的结果后，再进行返回。
 
 ## 第六章、其他
+* 6.1 全局API的转移
+    * 1. Vue2.x有许多全局API和配置
+        * 例如：注册全局组件、注册全局指令等
+        * ```
+            // 注册全局组件
+            Vue.component('MyComponent',{
+                data:()=>({
+                    count:0
+                })
+                template:'<button @click="count++">clicked {{count}} times</button>'
+            })
+            // 注册全局指令
+            Vue.directive('focus',{
+                inserted:el=>el.focus()
+            })
+          ```
+    * 2. Vue3.0中对这些API做出了调整
+        * 将全局的API做出了调整，即：Vue.xxx调整到应用实例(app)上
+        * ![Vue3的全局API和Vue2的全局API对比](images/Vue3的全局API和Vue2的全局API对比图.png)
+* 6.2 其他改变
+    * data选项应始终被声明为一个函数
+    * 过渡类名的更改：
+        * Vue2.x写法
+            * ```
+                .v-enter,
+                .v-leave-to{
+                    opacity:0;
+                }
+                .v-leave,
+                .v-enter-to{
+                    opacity:1;
+                }
+              ```
+        * Vue3.x写法
+            * ```
+                .v-enter-from,
+                .v-leave-to{
+                    opacity:0;
+                }
+                .v-leave-from,
+                .v-enter-to{
+                    opacity:1;
+                }
+              ```
+    * 移除keyCode作为v-on的修饰符，同时也不再支持config.keyCodes
+    * 移除v-on.native修饰符
+        * 父组件中绑定事件
+            * ```
+                <MyComponent
+                    v-on:close="handleComponentEvent"
+                    v-on:click="handleNativeClickEvent"
+                />
+              ```
+        * 子组件中声明自定义事件
+            * ```
+                <script>
+                    export default{
+                        emits:['close']
+                    }
+                </script>
+              ```
+    * 移除过滤器(filter)
+        * 过滤器虽然看起来很方便，但它需要一个自定义语法，打破大括号内表达式是“只是JavaScript”的假设，这不仅有学习成本，而且有实现成本。建议用方法调用或家孙属性去替换过滤器。
 
 
 # # 总结
@@ -700,3 +763,4 @@
 * 程序员亲自xxx.xxx并赋值给一个变量的不是响应式数据，那只是基本数据或普通对象
 * 页面没有变化有两种情况：1. 数据变化了，但数据不是响应式的，就像声明一个变量，将响应式数据里的一个属性赋值给变量一样，变量值变出花来，Vue没有监测到，那页面就不会有变化；2. 数据没有发生变化，也就是数据不允许被修改
 * 防抖：一定时间后再执行回调函数，期间被重新触发时则重新计时
+* data选项为什么一个呗声明为函数？防止组件在复用的时候产生数据关联关系，从而导致干扰
